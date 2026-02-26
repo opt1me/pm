@@ -1,5 +1,31 @@
+"use client";
+
 import { KanbanBoard } from "@/components/KanbanBoard";
+import { Login } from "@/components/Login";
+import { useAuth } from "@/lib/auth";
 
 export default function Home() {
-  return <KanbanBoard />;
+  const { isAuthenticated, isLoading, logout } = useAuth();
+
+  if (isLoading) {
+    return <div className="flex min-h-screen items-center justify-center bg-[#032147]"><div className="text-white text-xl">Loading...</div></div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
+
+  return (
+    <div className="relative">
+      <header className="absolute top-4 right-4 z-50">
+        <button
+          onClick={logout}
+          className="rounded bg-[#753991] px-4 py-2 text-sm font-medium text-white hover:bg-[#5e2d75] shadow-md transition-colors"
+        >
+          Sign Out
+        </button>
+      </header>
+      <KanbanBoard />
+    </div>
+  );
 }
