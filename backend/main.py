@@ -1,22 +1,27 @@
 import os
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
 
-app = FastAPI(title="Project Management MVP API")
+from database import get_db_connection, init_db
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
+
+app = FastAPI(title="Project Management MVP API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=["http://localhost:8000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 import json
 from pydantic import BaseModel
-from database import get_db_connection
 
 from ai_service import test_ai_connection
 
@@ -43,25 +48,24 @@ def chat_endpoint(req: ChatRequest):
     cursor = conn.cursor()
     cursor.execute("SELECT board_data FROM boards WHERE username = ?", ("user",))
     row = cursor.fetchone()
-    
+
     if not row:
         conn.close()
         return {"error": "Board not found"}
-        
+
     current_board = json.loads(row["board_data"])
-    
+
     from ai_service import chat_with_board_context
     ai_response = chat_with_board_context(req.message, current_board)
-    
+
     updated_board = ai_response.get("updated_board")
-    
-    # Defensive programming: validate the LLM's board string actually resembles the required schema
+
     is_valid_board = (
-        isinstance(updated_board, dict) and 
+        isinstance(updated_board, dict) and
         "columns" in updated_board and isinstance(updated_board["columns"], list) and
         "cards" in updated_board and isinstance(updated_board["cards"], dict)
     )
-    
+
     if updated_board and is_valid_board:
         cursor.execute(
             "UPDATE boards SET board_data = ? WHERE username = ?",
@@ -72,9 +76,9 @@ def chat_endpoint(req: ChatRequest):
         updated_board = None
         current_text = ai_response.get("text_response", "")
         ai_response["text_response"] = f"{current_text} (Note: I attempted to change the board but my output was corrupted, so the update was aborted to protect your data.)"
-        
+
     conn.close()
-    
+
     return {
         "text_response": ai_response.get("text_response", "An error occurred with the AI response."),
         "updated": bool(updated_board),
@@ -89,7 +93,7 @@ def get_board():
     cursor.execute("SELECT board_data FROM boards WHERE username = ?", ("user",))
     row = cursor.fetchone()
     conn.close()
-    
+
     if row:
         return json.loads(row["board_data"])
     return {"error": "Board not found"}

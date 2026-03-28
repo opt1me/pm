@@ -31,12 +31,17 @@ class TestDatabase(unittest.TestCase):
         table = cursor.fetchone()
         self.assertIsNotNone(table)
         
-        # Verify default user is populated
+        # Verify default user is populated with correct schema
         cursor.execute("SELECT username, board_data FROM boards WHERE username='user'")
         user_row = cursor.fetchone()
         self.assertIsNotNone(user_row)
         self.assertEqual(user_row[0], "user")
-        self.assertIn("columns", user_row[1]) # basic JSON validation check
+        import json
+        parsed = json.loads(user_row[1])
+        self.assertIn("columns", parsed)
+        self.assertIn("cards", parsed)
+        self.assertIsInstance(parsed["columns"], list)
+        self.assertIsInstance(parsed["cards"], dict)
         
         conn.close()
 

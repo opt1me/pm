@@ -36,18 +36,19 @@ class TestBackendAPI(unittest.TestCase):
         self.assertEqual(data["columns"][0]["id"], "col-backlog")
 
     def test_update_board_modifies_data(self):
-        # Create a new, modified board payload
+        # Create a new, modified board payload using the real schema shape
         new_board = {
             "columns": [
                 {
-                    "id": "col-todo",
-                    "title": "To Do",
-                    "cards": [
-                        {"id": "card-1", "title": "Setup project", "content": "Initialize NextJS and FastAPI"},
-                        {"id": "card-new", "title": "New Card", "content": "Added via API"}
-                    ]
+                    "id": "col-backlog",
+                    "title": "Backlog",
+                    "cardIds": ["card-1", "card-new"]
                 }
-            ]
+            ],
+            "cards": {
+                "card-1": {"id": "card-1", "title": "Setup project", "details": "Initialize NextJS and FastAPI"},
+                "card-new": {"id": "card-new", "title": "New Card", "details": "Added via API"}
+            }
         }
         
         # Call the PUT endpoint

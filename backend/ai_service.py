@@ -60,12 +60,11 @@ Do not include any markdown format tags like ```json.
             ],
             response_format={"type": "json_object"}
         )
+        import re
         response_content = completion.choices[0].message.content.strip()
-        # Clean up potential markdown formatting if the model still outputs it
-        if response_content.startswith("```json"):
-            response_content = response_content[7:]
-        if response_content.endswith("```"):
-            response_content = response_content[:-3]
+        # Strip any markdown code fences the model may add despite json_object mode
+        response_content = re.sub(r"^```[a-z]*\n?", "", response_content)
+        response_content = re.sub(r"\n?```$", "", response_content)
         return json.loads(response_content.strip())
     except Exception as e:
         print(f"Error in chat_with_board_context: {e}")

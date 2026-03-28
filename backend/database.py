@@ -88,5 +88,4 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Automatically initialize database when database.py is loaded.
-init_db()
+# Database is initialized explicitly via init_db() called from main.py lifespan.

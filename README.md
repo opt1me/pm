@@ -11,8 +11,15 @@ A beautifully designed, minimalist Kanban board featuring a built-in OpenRouter 
 
 ## Setup
 
-1. Copy `.env.example` to `.env` (if applicable) and ensure your `OPENROUTER_API_KEY` is set.
-2. Ensure Docker Desktop is running.
+1. Create a `.env` file in the project root with your OpenRouter API key:
+   ```
+   OPENROUTER_API_KEY=your_key_here
+   ```
+2. Build the frontend static export:
+   ```
+   cd frontend && npm install && npm run build
+   ```
+3. Ensure Docker Desktop is running.
 
 ## Running Locally
 
@@ -23,3 +30,5 @@ Use the provided scripts to start and stop the Docker environment:
 
 Once running, access the application at `http://localhost:8000`.
 Login with username "user" and password "password".
+
+Note: re-run `npm run build` in `frontend/` after any frontend changes before restarting Docker.

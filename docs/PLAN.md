@@ -65,23 +65,23 @@
 
 ## Part 8: AI connectivity
 
-- [ ] Add `python-dotenv` and OpenAI/OpenRouter generic client to the backend to use the requested `openai/gpt-oss-120b` model.
-- [ ] Create an internal testing endpoint `/api/ai_test` that sends a simple "2+2" math question and returns the string result.
+- [x] Add `python-dotenv` and OpenAI/OpenRouter generic client to the backend to use the requested `openai/gpt-oss-120b` model.
+- [x] Create an internal testing endpoint `/api/ai_test` that sends a simple "2+2" math question and returns the string result.
 - **Tests**: Wait for backend server to run, call `/api/ai_test`, and assert the result block contains "4".
 - **Success Criteria**: OpenRouter API key correctly authenticates, and the backend can successfully tunnel questions to the LLM and receive the raw string response.
 
 ## Part 9: AI with Kanban Context
 
-- [ ] Define Structured Outputs schema (JSON format) or function calling bindings allowing the LLM to optionally return Kanban updates alongside a message.
-- [ ] Update the AI service so it injects the current complete JSON Kanban board state into the system prompt context.
-- [ ] Expose an endpoint `/api/chat` that takes a user message, queries the LLM, updates the DB if structured output indicates an update, and finally returns the LLM text response.
+- [x] Define Structured Outputs schema (JSON format) or function calling bindings allowing the LLM to optionally return Kanban updates alongside a message.
+- [x] Update the AI service so it injects the current complete JSON Kanban board state into the system prompt context.
+- [x] Expose an endpoint `/api/chat` that takes a user message, queries the LLM, updates the DB if structured output indicates an update, and finally returns the LLM text response.
 - **Tests**: Send a sample human prompt like "Rename the first column to 'To Do Today'" and programmatically verify the DB gets updated appropriately and the text response makes sense.
 - **Success Criteria**: The backend successfully parses the LLM's structured output into precise database operations (with graceful error handling if the output format breaks).
 
 ## Part 10: AI Chat Sidebar widget
 
-- [ ] Build a sleek, modern UI sidebar component matching the app's rich aesthetics (dark navy, yellow accents, beautiful typography).
-- [ ] Hook the sidebar up to the updated `/api/chat` endpoint.
-- [ ] Implement automatic re-fetching of the board or return updated state directly from `/api/chat` to auto-refresh the UI if the AI altered the board layout.
+- [x] Build a sleek, modern UI sidebar component matching the app's rich aesthetics (dark navy, yellow accents, beautiful typography).
+- [x] Hook the sidebar up to the updated `/api/chat` endpoint.
+- [x] Implement automatic re-fetching of the board or return updated state directly from `/api/chat` to auto-refresh the UI if the AI altered the board layout.
 - **Tests**: Full E2E Playwright test mapping the flow: type in sidebar -> API call executes -> Board UI re-renders automatically with new cards/titles.
 - **Success Criteria**: A visually stunning side chat where commanding the AI to "add a card to buy milk" seamlessly causes a card to slide into existence on the Kanban board without a manual page refresh.

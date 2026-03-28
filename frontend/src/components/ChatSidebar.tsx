@@ -15,8 +15,11 @@ export function ChatSidebar({ onBoardUpdate }: ChatSidebarProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        const el = scrollRef.current;
+        if (!el) return;
+        const isAtBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 50;
+        if (isAtBottom) {
+            el.scrollTop = el.scrollHeight;
         }
     }, [messages]);
 

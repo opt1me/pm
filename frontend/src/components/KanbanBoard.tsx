@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -21,7 +21,11 @@ export const KanbanBoard = () => {
   const [activeCardId, setActiveCardId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const syncingRef = useRef(false);
+  const pendingBoardRef = useRef<BoardData | null>(null);
+
+  const loadBoard = () => {
+    setError(null);
     fetch("/api/board")
       .then((res) => {
         if (!res.ok) throw new Error("Failed to load board.");
@@ -32,9 +36,18 @@ export const KanbanBoard = () => {
         setBoard(data);
       })
       .catch((err) => setError(err.message));
+  };
+
+  useEffect(() => {
+    loadBoard();
   }, []);
 
   const syncBoard = async (newBoard: BoardData) => {
+    if (syncingRef.current) {
+      pendingBoardRef.current = newBoard;
+      return;
+    }
+    syncingRef.current = true;
     try {
       const res = await fetch("/api/board", {
         method: "PUT",
@@ -46,6 +59,13 @@ export const KanbanBoard = () => {
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Failed to save changes.");
+    } finally {
+      syncingRef.current = false;
+      if (pendingBoardRef.current) {
+        const next = pendingBoardRef.current;
+        pendingBoardRef.current = null;
+        syncBoard(next);
+      }
     }
   };
 
@@ -132,15 +152,21 @@ export const KanbanBoard = () => {
 
   if (error && !board) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#032147]">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--navy-dark)]">
         <div className="text-red-400 text-xl font-semibold bg-white/10 p-8 rounded shadow-lg">Error: {error}</div>
+        <button
+          onClick={loadBoard}
+          className="rounded-full bg-[var(--secondary-purple)] px-6 py-2 text-sm font-semibold text-white hover:bg-[#5e2d75]"
+        >
+          Try again
+        </button>
       </div>
     );
   }
 
   if (!board) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#032147]">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--navy-dark)]">
         <div className="text-white text-xl animate-pulse font-display">Loading board...</div>
       </div>
     );
