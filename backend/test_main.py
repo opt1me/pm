@@ -32,8 +32,8 @@ class TestBackendAPI(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIn("columns", data)
-        self.assertEqual(len(data["columns"]), 3)
-        self.assertEqual(data["columns"][0]["id"], "col-todo")
+        self.assertEqual(len(data["columns"]), 5)
+        self.assertEqual(data["columns"][0]["id"], "col-backlog")
 
     def test_update_board_modifies_data(self):
         # Create a new, modified board payload
